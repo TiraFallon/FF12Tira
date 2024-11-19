@@ -1,220 +1,45 @@
-<!-- saved from url=(0067)file:///D:/Misc/FFXII/FF%20XII%20%E2%80%93%20RNG%20Cure%20List.html -->
+<!DOCTYPE html>
 <html>
-<!--
-info about how random numbers are consumed:
-  http://www.kotha.net/ff12random/random-en.html
--->
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>FF XII – RNG Cure List</title>
-  <link rel="stylesheet" type="text/css" media="all" href="./FF XII - RNG Cure List_files/css">
-  <style>
-    /* CSSコード省略（そのまま） */
-  </style>
-  <script src="https://username.github.io/repository/mersenne-twister.2017.js"></script>
-  <script src="https://username.github.io/repository/jquery.min.js"></script>
-  <script>
-    var a; // Array of randomly generated values.
-    var m; // Mersenne Twister generator.
-    var start, end; // Start and end points for numbers generated so far.
-    var step = 100 * 1000;
+    <title>Seed Finder</title>
+    <script>
+        // JavaScriptの処理をここに記述します
+        function calculate() {
+            const button = document.getElementById("calculateButton");
+            button.disabled = true; // ボタンを一時的に無効化
 
-    var spell = NaN;
-    var level = NaN;
-    var magic = NaN;
-    var serenity = NaN;
+            const seedInput = document.getElementById("seq").value; // 入力値を取得
+            const seq = seedInput.split(',').map(Number); // カンマ区切りで配列に変換
 
-    function fNum(number) {
-      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    function generate(callback) {
-      if (!$.isFunction(callback)) callback = function () {};
-
-      end += step;
-
-      $('#forms').hide();
-      $('#notice').show().html(
-        'Generating '
-          + fNum(step)
-          + (start > 0 ? ' More' : '')
-          + ' Random Numbers&hellip; <span id=progress></span>'
-      );
-
-      generate_random(function () {
-        $('#notice').hide();
-        $('#forms').show();
-        callback();
-      });
-    }
-
-    function generate_random(callback) {
-      $('#progress').text(((a.length - start) / (end - start) * 100).toFixed(0) + '%');
-      if (a.length >= end) {
-        start = end;
-        setTimeout(callback, 0);
-        return;
-      }
-
-      for (var i = 0; i < 1000; i++) {
-        a.push(m.genrand_int32());
-      }
-
-      setTimeout(function () {
-        generate_random(callback)
-      }, 0);
-    }
-
-    function cure(random) {
-      return Math.floor(
-        (spell + random % (spell * 12.5) / 100)
-          * ((level + magic) * magic / 256 + 2)
-          * serenity
-      );
-    }
-
-    function show_cure() {
-      $('.error').hide();
-      $('#note').hide();
-      $('#notice').hide();
-      $('#output').hide();
-
-      $('#forms').show();
-      $('#set_cure').show();
-      $('#find').hide();
-    }
-
-    function contains_sequence(seed, seq) {
-      m = new MersenneTwister(seed, true);
-      var cure_values = [];
-      for (var i = 0; i < 10; i++) {
-        var rn = m.genrand_int32();
-        cure_values.push(cure(rn));
-      }
-
-      for (var i = 0; i < cure_values.length - seq.length; i++) {
-        if (cure_values[i] == seq[0]) {
-          var same = true;
-          for (var j = 0; j < seq.length; j++) {
-            if (cure_values[i + j] != seq[j]) {
-              same = false;
-              break;
+            // 入力値のバリデーション（5つの数値でなければ警告）
+            if (seq.length !== 5 || seq.some(isNaN)) {
+                alert("5つの数値をカンマ区切りで入力してください！");
+                button.disabled = false; // ボタンを再有効化
+                return;
             }
-          }
-          if (same) {
-            return true;
-          }
+
+            // 計算ロジック（ここで実際にシードを計算します）
+            const result = find_seed(seq);
+
+            // 結果を表示する
+            document.getElementById("result").innerText = `結果: ${result}`;
+
+            // 必要であれば、再度ボタンを有効化する
+            // button.disabled = false;
         }
-      }
-      return false;
-    }
 
-    function compute_seed_switch() {
-      var seq = $('[name=seq]').val().split(',');
-
-      for (var seed = 5800000; seed < 8000000; seed++) {
-        if (contains_sequence(seed, seq)) {
-          return seed;
+        function find_seed(seq) {
+            // シード値を計算する処理（仮の計算ロジックです）
+            // 実際の計算ロジックがあればここに記述してください
+            return seq.reduce((sum, num) => sum + num, 0); // 数値を合計する例
         }
-      }
-      return 0;
-    }
-
-    function compute_seed_pc() {
-      var t_start = $('[name=t_start]').val() - 15;
-      var t_end = t_start + 30;
-
-      var frame_start = 0;
-      var frame_end = 3600;
-
-      var seq = $('[name=seq]').val().split(',');
-
-      var ref_time = 1517673600;
-      var ref_time_term = 696964805;
-
-      for (var t = t_start; t < t_end; t++) {
-        var time_term = ref_time_term + (t - ref_time) * 33;
-        for (var f = frame_start; f < frame_end; f++) {
-          var frame_term = 600 * f;
-          var seed = time_term + frame_term;
-
-          if (contains_sequence(seed, seq)) {
-            return seed;
-          }
-        }
-      }
-
-      return 0;
-    }
-
-    function set_cure() {
-      $('#set_cure .error').hide();
-
-      var game = $('[name=game]').val();
-
-      var power = (game == 'original') ? [20, 45, 85, 145] : [20, 46, 86, 120];
-
-      spell = power[parseInt($('[name=spell]').val())];
-      level = parseInt($('[name=level]').val());
-      magic = parseInt($('[name=magic]').val());
-      serenity = $('[name=serenity]').is(':checked') ? 1.5 : 1;
-
-      if (isNaN(level) || isNaN(magic)) {
-        $('#set_cure .error').show().text('Make sure fields all fields are filled.');
-        return;
-      }
-
-      var seed = 4537;
-      if (game == "TZA_PC") {
-        seed = compute_seed_pc();
-      } else if (game == "TZA_Switch") {
-        seed = compute_seed_switch();
-      }
-
-      if (seed == 0) {
-        $('#no_seed').show();
-        return;
-      }
-
-      console.log(seed);
-
-      m = new MersenneTwister(seed, game == 'TZA' || game == 'TZA_PC' || game == 'TZA_Switch');
-
-      start = end = 0;
-      a = [];
-      generate(function () {
-        $('#set_cure').hide();
-        $('#find').show();
-        show_values();
-      });
-    }
-
-    /* その他関数は元のまま */
-    function find() { /* ... */ }
-    function find_pattern() { /* ... */ }
-    function get_time() { /* ... */ }
-    function show_values() { /* ... */ }
-
-    $(function () {
-      $('#forms').show();
-      $('#note').hide();
-
-      $('#notice').hide();
-      $('#set_cure').show();
-
-      $('[name=game]').on('change', function () {
-        if ($('[name=game]').val() == "TZA_PC" || $('[name=game]').val() == "TZA_Switch") {
-          $('#pc_note').show();
-        } else {
-          $('#pc_note').hide();
-        }
-      });
-    });
-  </script>
+    </script>
 </head>
 <body>
-  <div id="contain">
-    <!-- HTML要素省略 -->
-  </div>
+    <h1>Seed Finder</h1>
+    <label for="seq">5つの数値を入力（カンマ区切り）:</label>
+    <input type="text" id="seq" placeholder="例: 12,34,56,78,90">
+    <button id="calculateButton" onclick="calculate()">Calculate</button>
+    <p id="result">ここに結果が表示されます。</p>
 </body>
 </html>
