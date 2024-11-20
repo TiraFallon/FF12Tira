@@ -4,28 +4,7 @@
 
 info about how random numbers are consumed:
   http://www.kotha.net/ff12random/random-en.html
--->
-
- /*ここに追記*/
-<script>
-    // 全てのエラーをキャッチして表示
-    window.onerror = function (message, source, lineno, colno, error) {
-        const errorDiv = document.createElement('div');
-        errorDiv.style.color = 'red';
-        errorDiv.style.backgroundColor = '#fdd';
-        errorDiv.style.padding = '10px';
-        errorDiv.innerText = `
-            Error: ${message}
-            Source: ${source}
-            Line: ${lineno}, Column: ${colno}
-            Stack: ${error?.stack || 'N/A'}
-        `;
-        document.body.prepend(errorDiv);
-    };
-
-
-
-<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>FF XII – RNG Cure List</title>
   <link rel="stylesheet" type="text/css" media="all" href="./FF XII - RNG Cure List_files/css">
   <style>
@@ -503,6 +482,26 @@ info about how random numbers are consumed:
     
     </script>
 </head>
+
+
+
+<script>
+    window.onerror = function (message, source, lineno, colno, error) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.color = 'red';
+        errorDiv.style.backgroundColor = '#fdd';
+        errorDiv.style.padding = '10px';
+        errorDiv.innerText = `
+            Error: ${message}
+            Source: ${source}
+            Line: ${lineno}, Column: ${colno}
+            Stack: ${error?.stack || 'N/A'}
+        `;
+        document.body.prepend(errorDiv);
+    };
+
+
+
 
 <body><div id="contain">
   <h1>Final Fantasy XII – RNG Cure List</h1>
