@@ -485,25 +485,6 @@ info about how random numbers are consumed:
 </head>
 
 
-
-<script>
-    window.onerror = function (message, source, lineno, colno, error) {
-        const errorDiv = document.createElement('div');
-        errorDiv.style.color = 'red';
-        errorDiv.style.backgroundColor = '#fdd';
-        errorDiv.style.padding = '10px';
-        errorDiv.innerText = `
-            Error: ${message}
-            Source: ${source}
-            Line: ${lineno}, Column: ${colno}
-            Stack: ${error?.stack || 'N/A'}
-        `;
-        document.body.prepend(errorDiv);
-    };
-</script>
-
-
-
 <body><div id="contain">
   <h1>Final Fantasy XII – RNG Cure List</h1>
   <div id="notice" style="display: none;">
